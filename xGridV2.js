@@ -1,7 +1,7 @@
-// export default (function() {
+export default (function() {
 
 // eslint-disable-next-line no-unused-vars
-let xGrid = (function () {
+// let xGrid = (function () {
     const version = 2.0;
     const state = { save: 'save', insert: 'insert', update: 'update', select: 'select', cancel: 'cancel', delete: 'delete' }
     // configuração de icones global

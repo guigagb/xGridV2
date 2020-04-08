@@ -21,5 +21,44 @@
 Clone o repositório em um diretório local.
 
 ```sh
-    git clone git@github.com:guigagb/mofo-v2.git
+    git clone git@github.com:dffrancisco/xGridV2.git
+```
+## Importando
+
+Em seu html declare o css:
+```html
+    <link rel="stylesheet" href="./xGridV2.css">
+```
+
+Para usar o xGrid você deve chamá-lo em seu arquivo .js através de import.
+```javascript
+    import xGrid from './xGridV2';
+```
+## Modo de Uso
+
+É necessário um elemento no seu html com um id ou classe para usar na instância do xGrid.
+
+```html
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <title>xGrid v2.0</title>
+        <link rel="stylesheet" href="./xGridV2.css">
+    </head>
+    <body>
+        <div id="pnGrid"></div>
+        <script src="./xGridV2.js"></script>
+        <script src="example.js" type="module"></script>
+    </body>
+    </html>
+```
+No javascript iremos instanciar o objeto da seguinte forma:
+
+<h3>Create</h3>
+
+```javascript
+    const grid = new xGrid.create({
+        el: '#pnGrid',
+        
+    })
 ```
