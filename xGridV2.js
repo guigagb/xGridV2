@@ -1,16 +1,29 @@
 export default (function() {
-
 // eslint-disable-next-line no-unused-vars
-// let xGrid = (function () {
+// let xGridV2 = (function () {
     const version = 2.0;
     const state = { save: 'save', insert: 'insert', update: 'update', select: 'select', cancel: 'cancel', delete: 'delete' }
-    // configuração de icones global
-    // ajaxSetup global
+    let notFound = 'Nada Localizado'
+    let printHead = '';
 
     function create(param) {
-
         let argDefault = {
             source: [],
+            onSelectLine: false,
+            heightLine: false,
+            height: 'default',
+            width: 'default',
+            setfocus: false,
+            multiSelect: false,
+            render: {},
+            theme: 'x-grayV2',
+            sideBySide: false,
+            click: false,
+            dblClick: false,
+            enter: false,
+            count: false,
+            title: true,
+            columns: {},
             filter: {
                 filterBegin: false,
                 concat: {
@@ -21,30 +34,16 @@ export default (function() {
                     condicional: 'OR'
                 }
             },
-            columns: {},
-            onSelectLine: false,
             compare: {},
-            heightLine: '',
-            height: 'default',
-            width: 'default',
-            setfocus: false,
-            render: {},
-            theme: 'x-gray',
             query: {
                 endScroll: 0.1,
                 execute: false,
             },
             afterSearch: false,
-            sideBySide: false,
-            click: false,
-            dblClick: false,
-            enter: false,
             duplicity: false,
             frame: false,
             complete: false,
             keyDown: false,
-            count: false,
-            title: true
         };
 
         param = Object.assign({}, param);
@@ -74,10 +73,11 @@ export default (function() {
             buttonsFrame: {},
             messageDuplicity: '',
             listTabForEnter: false,
+            filterControl: false,
             constructor() {
                 this.element = document.querySelector(this.arg.el)
                 this.idElment = this.element.id
-                this.element.classList.add("xGrid-main");
+                this.element.classList.add("xGridV2-main");
                 this.element.classList.add(this.arg.theme);
 
                 if (this.arg.height != 'default') this.element.style.height = `${this.arg.height}px`
@@ -91,9 +91,9 @@ export default (function() {
                 // lê os fields do html
                 if (this.arg.sideBySide) {
                     if (this.arg.sideBySide.el) {
-                        this.listTabForEnter =
-                            [...document.querySelector(this.arg.sideBySide.el)
-                                .querySelectorAll('input[name], select[name],button[name],textarea[name]')]
+                        this.listTabForEnter = [...document.querySelector(this.arg.sideBySide.el)
+                            .querySelectorAll('input[name], select[name],button[name],textarea[name]')
+                        ]
                         let qto = 0;
                         document.querySelectorAll(this.arg.sideBySide.el).forEach((el) => {
                             el.querySelectorAll('[name]').forEach((field) => {
@@ -123,11 +123,11 @@ export default (function() {
             },
             createTitle() {
                 this.gridTitle = document.createElement("div")
-                this.gridTitle.classList.add('xGrid-title')
-                this.gridTitle.classList.add('xGrid-row')
+                this.gridTitle.classList.add('xGridV2-title')
+                this.gridTitle.classList.add('xGridV2-row')
 
                 if (Object.keys(this.arg.columns).length > 0) {
-                    this.checkWidthColuns();
+                    this.checkWidthColumns();
                     this.widthAll = Object.values(this.arg.columns).reduce((total, b) => total + parseInt(b.width), 0);
                     this.setColumnsTitle(this.arg.columns);
                 } else
@@ -148,13 +148,18 @@ export default (function() {
             },
             setColumnsTitle(columns) {
 
+                if (this.arg.title == false)
+                    return
+
                 for (let id in columns) {
                     let col = document.createElement("div")
-                    let span = document.createElement("span")
                     let label = document.createElement("label")
+                    let span = document.createElement("span")
+                    let resize = document.createElement("div")
+                    resize.classList.add('siz')
 
                     col.setAttribute('name', columns[id].dataField)
-                    col.classList.add('xGrid-col')
+                    col.classList.add('xGridV2-col')
                     col.style.width = columns[id].width
 
                     if (columns[id].dataField == '_count_')
@@ -166,25 +171,40 @@ export default (function() {
                             span.innerHTML = id
 
                     col.appendChild(span)
+                    col.appendChild(resize)
                     col.appendChild(label)
 
                     this.gridTitle.appendChild(col)
+
+                    col.addEventListener('click', () => { this.orderByGrid(columns[id].dataField, col) })
+
+                    this.resizeTitle(resize)
                 }
 
-                if (this.widthAll > 100) {
+                if (this.widthAll > 100)
                     this.gridTitle.lastChild.style.paddingRight = '3px'
-                }
-                // this.gridTitle.appendChild(templete)
+
+                this.orderByGrid();
 
             },
             setContent() {
                 this.gridContent = document.createElement("div")
-                this.gridContent.classList.add('xGrid-content')
+                this.gridContent.classList.add('xGridV2-content')
 
                 // this.gridContent.style.width = `${this.widthAll}%`
 
                 if (this.arg.query.execute)
                     this.gridContent.addEventListener('scroll', this.eventListenerScroll)
+
+                if (this.arg.dblClick)
+                    this.gridContent.addEventListener('dblclick', () => {
+                        this.arg.dblClick(this.sourceSelect);
+                    })
+
+                if (this.arg.click)
+                    this.gridContent.addEventListener('click', () => {
+                        this.arg.click(this.sourceSelect);
+                    })
 
 
                 return this.gridContent;
@@ -195,7 +215,8 @@ export default (function() {
 
                 // while (this.gridContent.firstChild) this.gridContent.removeChild(this.gridContent.firstChild)
 
-                this.arg.source = [];
+                if (this.filterControl == false)
+                    this.arg.source = [];
 
                 this.setTitle(source)
 
@@ -219,7 +240,7 @@ export default (function() {
                     this.focus(this.arg.setfocus - 1)
 
             },
-            checkWidthColuns() {
+            checkWidthColumns() {
                 let valPercente = 0;
                 let qtoColumn = 0;
 
@@ -278,7 +299,8 @@ export default (function() {
                     if (value == undefined)
                         return false
                     else
-                        return this.arg.compare[col.compare](_source)
+                        //    return this.arg.compare[col.compare](_source)
+                        return value
                 }
             },
             createLine(source, order) {
@@ -293,8 +315,13 @@ export default (function() {
 
                 for (let i in source) {
                     this.arg.source[this.tabindex] = source[i]
+
                     let div = document.createElement('div');
-                    div.classList.add('xGrid-row')
+                    div.classList.add('xGridV2-row')
+
+                    if (this.arg.heightLine)
+                        div.style.height = `${this.arg.heightLine}px`
+
                     div.setAttribute('tabindex', this.tabindex)
                     this.tabindex++
 
@@ -302,29 +329,22 @@ export default (function() {
                         source[i]._count_ = this.tabindex
 
                     for (let c in col) {
-
-                        // if (this.arg.count) {
-                        //     console.log(col[c].dataField);
-
+                        let divCol = document.createElement('div')
+                        // let span = document.createElement('span')
                         let value = source[i][col[c].dataField]
-
                         let compare = this.setCompare(col[c], source[i])
+
                         if (compare) value = compare
 
-                        if (col[c].render != undefined)
-                            value = col[c].render(value)
+                        if (col[c].render) value = col[c].render(value)
 
-                        if (col[c].style != undefined) {
-                            value = '<span style="width:100%; ' + col[c].style + ' ">' + value + '</span>'
-                        }
+                        value = this.elementSpanConfig(col[c], value)
 
                         if (this.arg.count)
                             if (col[c].dataField == '_count_')
-                                value = '<span style="width:100%;text-align: center;opacity: 0.5; ">' + value + '</span>'
+                                value = `<span style="width:100%;text-align: center;opacity: 0.5;">${value}</span>`
 
-
-                        let divCol = document.createElement('div');
-                        divCol.classList.add('xGrid-col')
+                        divCol.classList.add('xGridV2-col')
                         divCol.style.width = col[c].width
                         divCol.setAttribute('name', col[c].dataField)
                         divCol.innerHTML = value
@@ -345,8 +365,19 @@ export default (function() {
 
                 }
 
-                if (Object.keys(source).length > 0)
+
+                if (Object.keys(source).length > 0) {
                     this.controlScroll = true
+                    if (this.gridContent.querySelector('nav'))
+                        this.gridContent.querySelector('nav').remove()
+                } else
+                    if (!this.gridContent.querySelector('nav')) {
+                        let nav = document.createElement('nav')
+                        nav.innerHTML = notFound
+                        this.gridContent.appendChild(nav)
+                    }
+
+
                 this.closeLoad()
                 this.loadMore(false)
             },
@@ -354,9 +385,10 @@ export default (function() {
                 _control: false,
                 divDisable: [],
                 keyup(e) {
-                    if (e.keyCode == 17) {
-                        ax.onEvent._control = false
-                    }
+                    if (ax.arg.multiSelect)
+                        if (e.keyCode == 17) {
+                            ax.onEvent._control = false
+                        }
                 },
                 keydown(e) {
                     // seta para cima
@@ -439,37 +471,34 @@ export default (function() {
                         e.stopPropagation();
                     }
 
-
                     // control pressionado
-                    if (e.keyCode == 17)
-                        ax.onEvent._control = true
+                    if (ax.arg.multiSelect)
+                        if (e.keyCode == 17)
+                            ax.onEvent._control = true
 
                 },
                 focusin(e) {
 
-                    // let el = ax.element.querySelector('.xGrid-content');
+                    // let el = ax.element.querySelector('.xGridV2-content');
                     let el = ax.gridContent
-                    let select = el.querySelectorAll('.xGrid-Selected')
-                    let selectOut = el.querySelectorAll('.xGrid-SelectedFocusOut')
+                    let select = el.querySelectorAll('.xGridV2-Selected')
+                    let selectOut = el.querySelectorAll('.xGridV2-SelectedFocusOut')
 
                     if (ax.onEvent._control == false) {
-                        select.forEach(r => r.classList.remove("xGrid-Selected"))
-                        selectOut.forEach(r => r.classList.remove("xGrid-SelectedFocusOut"))
+                        select.forEach(r => r.classList.remove("xGridV2-Selected"))
+                        selectOut.forEach(r => r.classList.remove("xGridV2-SelectedFocusOut"))
 
                         ax.indexSelect = e.currentTarget.getAttribute('tabindex')
                         ax.sourceSelect = ax.arg.source[ax.indexSelect]
 
-
-
                         ax.setElementSideBySide()
-
 
                     } else {
                         ax.indexSelect = e.currentTarget.getAttribute('tabindex')
                         ax.sourceSelect[ax.indexSelect] = ax.arg.source[ax.indexSelect]
                     }
 
-                    e.target.classList.add('xGrid-Selected')
+                    e.target.classList.add('xGridV2-Selected')
 
                     ax.onSelectLine()
 
@@ -478,10 +507,10 @@ export default (function() {
                 },
                 focusout() {
                     if (ax.onEvent._control == false) {
-                        let select = ax.gridContent.querySelectorAll('.xGrid-Selected')
+                        let select = ax.gridContent.querySelectorAll('.xGridV2-Selected')
                         select.forEach((r) => {
-                            r.classList.remove("xGrid-Selected");
-                            r.classList.add("xGrid-SelectedFocusOut");
+                            r.classList.remove("xGridV2-Selected");
+                            r.classList.add("xGridV2-SelectedFocusOut");
                         })
                     }
                 },
@@ -492,7 +521,7 @@ export default (function() {
                     el.addEventListener('keyup', this.keyup)
                 },
                 removeEventListenerAndRemoveElement() {
-                    Object.values(ax.gridContent.querySelectorAll('.xGrid-row')).map((el) => {
+                    Object.values(ax.gridContent.querySelectorAll('.xGridV2-row')).map((el) => {
                         el.removeEventListener('focusin', this.focusin)
                         el.removeEventListener('keydown', this.keydown)
                         el.removeEventListener('focusout', this.focusout)
@@ -501,7 +530,7 @@ export default (function() {
                     })
                 },
                 removeEventListener() {
-                    Object.values(ax.gridContent.querySelectorAll('.xGrid-row')).map((el) => {
+                    Object.values(ax.gridContent.querySelectorAll('.xGridV2-row')).map((el) => {
                         el.removeEventListener('focusin', this.focusin)
                         el.removeEventListener('keydown', this.keydown)
                         el.removeEventListener('focusout', this.focusout)
@@ -516,13 +545,27 @@ export default (function() {
                 },
                 setEventListenerAll() {
                     this.removeEventListener();
-                    Object.values(ax.gridContent.querySelectorAll('.xGrid-row')).map((el) => {
+                    Object.values(ax.gridContent.querySelectorAll('.xGridV2-row')).map((el) => {
                         el.addEventListener('focusin', this.focusin)
                         el.addEventListener('keydown', this.keydown)
                         el.addEventListener('focusout', this.focusout)
                         el.addEventListener('keyup', this.keyup)
                     })
                 }
+            },
+            elementSpanConfig(col, value) {
+                let span = document.createElement('span')
+                if (col.style || col.class || col.center || col.right) {
+                    if (col.style) span.style = col.style
+                    span.style.width = '100%'
+                    if (col.class) col.class.split(' ').forEach((e) => span.classList.add(e))
+                    if (col.center) span.style.textAlign = 'center'
+                    if (col.right) span.style.textAlign = 'right'
+                    span.innerHTML = value
+                    return span.outerHTML
+                }
+
+                return value
             },
             dataSource(field, value) {
 
@@ -534,17 +577,17 @@ export default (function() {
 
                         for (let i in columns) {
                             if (columns[i].dataField == field) {
+                                //  let span = document.createElement('span')
+
                                 ax.sourceSelect[field] = value;
 
                                 let compare = this.setCompare(columns[i], ax.sourceSelect)
                                 if (compare) value = compare
 
-
                                 if (columns[i].render != undefined)
                                     value = columns[i].render(value)
 
-                                if (columns[i].style != undefined)
-                                    value = '<span style="width:100%; ' + columns[i].style + ' ">' + value + '</span>'
+                                value = this.elementSpanConfig(columns[i], value)
                             }
                         }
 
@@ -575,8 +618,8 @@ export default (function() {
                                 if (columns[i].render != undefined)
                                     _value = columns[i].render(_value)
 
-                                if (columns[i].style != undefined)
-                                    _value = '<span style="width:100%; ' + columns[i].style + ' ">' + _value + '</span>'
+                                _value = this.elementSpanConfig(columns[i], _value)
+
                             }
                         }
                         cell.innerHTML = _value
@@ -622,8 +665,8 @@ export default (function() {
             disable(call) {
                 this.onEvent.divDisable[0] = document.createElement('div')
                 this.onEvent.divDisable[1] = document.createElement('div')
-                this.onEvent.divDisable[0].classList.add('xGrid-disable')
-                this.onEvent.divDisable[1].classList.add('xGrid-disable')
+                this.onEvent.divDisable[0].classList.add('xGridV2-disable')
+                this.onEvent.divDisable[1].classList.add('xGridV2-disable')
 
                 this.onEvent.removeEventListener()
 
@@ -639,17 +682,19 @@ export default (function() {
 
             },
             enable(call) {
-                this.onEvent.divDisable[0].remove()
-                this.onEvent.divDisable[1].remove()
+                if (this.onEvent.divDisable[0]) {
+                    this.onEvent.divDisable[0].remove()
+                    this.onEvent.divDisable[1].remove()
 
-                this.onEvent.setEventListenerAll()
+                    this.onEvent.setEventListenerAll()
 
-                if (this.widthAll > 100)
-                    this.element.style.overflow = 'auto'
+                    if (this.widthAll > 100)
+                        this.element.style.overflow = 'auto'
 
-                this.gridDisable = false
+                    this.gridDisable = false
 
-                call && call()
+                    call && call()
+                }
             },
             clear(call) {
                 this.onEvent.removeEventListenerAndRemoveElement()
@@ -658,7 +703,7 @@ export default (function() {
             loadMore(open = true) {
                 if (open) {
                     this.divLoadMore = document.createElement('div')
-                    this.divLoadMore.classList.add('xGrid-load-search')
+                    this.divLoadMore.classList.add('xGridV2-load-search')
                     this.divLoadMore.innerHTML = '<i class="fa fa-spinner fa-pulse fa-fw fa-lg"></i> Carregando'
 
                     this.element.insertBefore(this.divLoadMore, this.element.firstChild)
@@ -672,7 +717,7 @@ export default (function() {
                 if (text == undefined)
                     text = 'Carregando . . .';
                 this.divLoad = document.createElement('div')
-                this.divLoad.classList.add('xGrid-load')
+                this.divLoad.classList.add('xGridV2-load')
                 this.divLoad.innerHTML = '<i class="fa fa-spinner fa-pulse fa-fw fa-lg"></i> ' + text;
 
                 this.element.insertBefore(this.divLoad, this.element.firstChild)
@@ -709,13 +754,13 @@ export default (function() {
 
                 this.onEvent.removeEventListenerElement(target)
 
-                target.classList.add('xGrid-deleteLine');
+                target.classList.add('xGridV2-deleteLine');
                 setTimeout(() => {
                     target.remove()
                 }, 500);
 
 
-                // if (element.find('.xGrid-content .xGrid-row').length == 1)
+                // if (element.find('.xGridV2-content .xGridV2-row').length == 1)
                 //     if (arg.sideBySide != false)
                 //         clearDataSource();
 
@@ -748,14 +793,14 @@ export default (function() {
                     let altKey = e.altKey ? "alt+" : "";
                     let key = ctrlKey + shiftKey + altKey + e.keyCode;
 
-
                     if (key == 13) {
                         if (this.arg.enter)
                             this.arg.enter(this.sourceSelect, e)
                     }
 
-                    if (this.arg.onKeyDown[key])
-                        this.arg.onKeyDown[key](this.sourceSelect, e)
+                    if (this.arg.onKeyDown)
+                        if (this.arg.onKeyDown[key])
+                            this.arg.onKeyDown[key](this.sourceSelect, e)
 
                     e.preventDefault();
                     e.stopPropagation();
@@ -829,19 +874,19 @@ export default (function() {
                             let type = this.elementSideBySide[i].type
 
                             if (this.arg.sideBySide.render)
-                                if (this.arg.render[this.arg.sideBySide.render[i]])
+                                if (this.arg.sideBySide.render[i])
                                     try {
                                         value = this.arg.sideBySide.render[i](value)
                                     } catch (error) { throw 'erro see your function render' }
 
                             if (this.arg.sideBySide.compare)
-                                if (this.arg.compare[this.arg.sideBySide.compare[i]]) {
+                                if (this.arg.compare[this.arg.sideBySide.compare[i]])
                                     try {
                                         let _source = { ...this.sourceSelect }
                                         _source.value = value
                                         value = this.arg.compare[this.arg.sideBySide.compare[i]](_source)
                                     } catch (error) { throw 'erro see your function compare' }
-                                }
+
 
                             switch (type) {
                                 case undefined:
@@ -879,11 +924,12 @@ export default (function() {
                                 case 'checkbox':
                                     ax.elementSideBySide[i].checked = (value == '1' ? true : false)
                                     break;
-                                case '': { //href
-                                    ax.elementSideBySide[i].href = value
-                                    ax.elementSideBySide[i].innerHTML = value
-                                    break;
-                                }
+                                case '':
+                                    { //href
+                                        ax.elementSideBySide[i].href = value
+                                        ax.elementSideBySide[i].innerHTML = value
+                                        break;
+                                    }
                             }
                         }
                 }
@@ -904,7 +950,6 @@ export default (function() {
             },
             clearElementSideBySide() {
                 if (this.arg.sideBySide)
-
                     if (this.arg.sideBySide.el)
                         for (let i in this.elementSideBySide) {
                             let type = this.elementSideBySide[i].type
@@ -958,10 +1003,11 @@ export default (function() {
                 else
                     this.createLine(source)
             },
-            queryOpen(param) {
+            queryOpen(param, call) {
                 this.paramQuery = param
                 this.tabindex = 0
                 this.arg.query.execute(this.tabindex, param)
+                call && call()
             },
             frame() {
                 let btns = {}
@@ -986,41 +1032,37 @@ export default (function() {
 
                             if (this.arg.sideBySide.frame[key].click)
                                 btn.addEventListener('click', (e) => {
-                                    if (this.arg.sideBySide.frame[key].click(this.sourceSelect, e) == false)
-                                        return false
+                                    if (ax.arg.sideBySide.frame[key].click(this.sourceSelect, e) == false) return false
 
-                                    if (e.target.getAttribute('state') != state.delete)
-                                        for (let keyBtns in btns) {
-                                            this.buttonsFrame[keyBtns].disabled = !this.buttonsFrame[keyBtns].disabled
-                                        }
+                                    if ([state.insert, state.update].indexOf(e.target.getAttribute('state')) >= 0) {
+                                        this.disableFieldsSideBySide(true)
+                                        this.disabledBtnsSalvarCancelar(true)
+                                    }
+
+                                    if ([state.save, state.cancel].indexOf(e.target.getAttribute('state')) >= 0) {
+                                        this.disableFieldsSideBySide(false)
+                                        this.disabledBtnsSalvarCancelar(false)
+                                    }
+
                                 })
 
+                            if (this.arg.sideBySide.frame[key].class) this.arg.sideBySide.frame[key].class.split(' ').forEach((e) => btn.classList.add(e))
 
-                            if (this.arg.sideBySide.frame[key].class)
-                                this.arg.sideBySide.frame[key].class.split(' ').forEach((e) => btn.classList.add(e))
-
-                            if (this.arg.sideBySide.frame[key].style)
-                                btn.style = this.arg.sideBySide.frame[key].style
-
+                            if (this.arg.sideBySide.frame[key].style) btn.style = this.arg.sideBySide.frame[key].style
 
                             if (this.arg.sideBySide.frame[key].state) {
                                 btn.setAttribute('state', this.arg.sideBySide.frame[key].state)
                                 btns[key] = this.arg.sideBySide.frame[key].state
                                 if (this.arg.sideBySide.frame[key].state == 'save')
                                     this.listTabForEnter.push(btn)
-                                // this.buttonsFrame['_save_'] = btn
                             }
 
-                            if (this.arg.sideBySide.frame[key].state == state.save || this.arg.sideBySide.frame[key].state == state.cancel)
-                                btn.disabled = true
-
+                            if (this.arg.sideBySide.frame[key].state == state.save || this.arg.sideBySide.frame[key].state == state.cancel) btn.disabled = true
 
                             this.buttonsFrame[key] = btn
 
-
-
                             elFrame.appendChild(btn)
-
+                            ax.disableFieldsSideBySide(true)
                         }
                     }
             },
@@ -1107,14 +1149,286 @@ export default (function() {
                         this.elementSideBySide[name].select()
             },
             disabledBtnsSalvarCancelar(disabled = true) {
+
                 for (let i in this.buttonsFrame)
                     if (this.buttonsFrame[i].getAttribute('state') == 'save') {
-                        if (this.buttonsFrame[i].disabled == disabled)
+                        if (this.buttonsFrame[i].disabled == disabled) {
+                            this.disableFieldsSideBySide(!this.buttonsFrame[i].disabled)
                             for (let i in this.buttonsFrame)
                                 if (this.buttonsFrame[i].getAttribute('state'))
                                     this.buttonsFrame[i].disabled = !this.buttonsFrame[i].disabled
-                        break
+                            break
+                        }
                     }
+            },
+            disableFieldsSideBySide(disable = false) {
+
+                for (let i in this.elementSideBySide) {
+                    let type = this.elementSideBySide[i].type
+
+                    switch (type) {
+                        case 'text':
+                        case 'password':
+                        case 'textarea':
+                        case 'number':
+                        case 'tel':
+                        case 'date':
+                        case 'time':
+                        case 'range':
+                        case 'hidden':
+                            ax.elementSideBySide[i].readOnly = disable
+                            break;
+                        case 'radio':
+                            // eslint-disable-next-line no-case-declarations
+                            let radios = { ...ax.elementSideBySide[i] }
+                            delete radios.type
+                            for (let r in radios) {
+                                radios[r].disabled = disable
+                                break
+                            }
+                            break;
+                        case 'select-one':
+                            ax.elementSideBySide[i].disabled = disable
+                            break;
+                        case 'checkbox':
+                            ax.elementSideBySide[i].disabled = disable
+                            break;
+
+                    }
+                }
+
+
+                // $(sideBySide.id).find("input[type='text'], textarea").prop('readonly', false);
+                // $(sideBySide.id).find("select, input[type='radio'], input[type='checkbox']").prop('disabled', false);
+
+
+
+            },
+            resizeTitle(resizers) {
+                let fieldTitle
+                let listContent
+                let text
+                let width
+
+                resizers.addEventListener('mousedown', function (e) {
+
+                    fieldTitle = ax.gridTitle.querySelector('[name="' + this.parentElement.getAttribute('name') + '"]')
+
+                    text = ax.gridTitle.querySelector('[name="' + this.parentElement.getAttribute('name') + '"]').querySelector('span').innerHTML
+
+                    listContent = [...ax.gridContent.querySelectorAll('[name="' + this.parentElement.getAttribute('name') + '"]')]
+
+                    ax.gridTitle.style.cursor = 'col-resize'
+                    document.querySelector('html').style.cursor = 'col-resize'
+
+                    e.preventDefault()
+                    window.addEventListener('mousemove', resize)
+                    window.addEventListener('mouseup', stopResize)
+                })
+
+                // eslint-disable-next-line no-inner-declarations
+                function resize(e) {
+                    width = e.pageX - fieldTitle.getBoundingClientRect().left + 'px'
+                    fieldTitle.style.width = width
+                    for (let i in listContent) listContent[i].style.width = width
+                }
+
+                // eslint-disable-next-line no-inner-declarations
+                function stopResize() {
+                    if (Object.keys(ax.arg.columns).length > 0)
+                        ax.arg.columns[text].width = width
+                    else
+                        ax.columnsAutoCreate.width = width
+
+                    document.querySelector('html').style.cursor = 'default'
+                    ax.gridTitle.style.cursor = "default";
+                    window.removeEventListener('mousemove', resize)
+                }
+            },
+            orderByGrid(field, col) {
+                if (field == undefined) return
+
+                let label = col.querySelector('label');
+                let order = label.getAttribute('order');
+
+                if (field == '_count_') return
+
+                if (order == 'asc') {
+                    label.removeAttribute('order')
+                    label.classList.remove('xGridV2Asc')
+                    label.classList.remove('xGridV2Desc')
+                }
+
+                this.gridTitle.querySelectorAll('label').forEach(el => {
+                    el.classList.remove('xGridV2Asc')
+                    el.classList.remove('xGridV2Desc')
+                    el.removeAttribute('order')
+                })
+
+                let newArray = this.arg.source.sort(function (a, b) {
+
+                    if (a[field] == null || a[field] == undefined)
+                        a[field] = ''
+                    if (b[field] == null || b[field] == undefined)
+                        b[field] = ''
+
+
+                    if (order == undefined) {
+                        try {
+                            return a[field].localeCompare(b[field], undefined, { numeric: true, sensitivity: 'base' })
+                        } catch (error) {
+                            return (a[field] > b[field]) ? 1 : (a[field] == b[field]) ? ((a[field].size > b[field].size) ? 1 : -1) : -1;
+                        }
+                    }
+                    if (order == 'asc')
+                        try {
+                            return b[field].localeCompare(a[field], undefined, { numeric: true, sensitivity: 'base' })
+                        } catch (error) {
+                            return (a[field] < b[field]) ? 1 : (a[field] == b[field]) ? ((a[field].size < b[field].size) ? 1 : -1) : -1;
+                        }
+                })
+
+
+                if (order == undefined) {
+                    label.setAttribute('order', 'asc')
+                    label.classList.add('xGridV2Asc')
+                }
+
+                if (order == 'asc') {
+                    label.setAttribute('order', 'desc')
+                    label.classList.add('xGridV2Desc')
+                }
+
+                this.source(newArray)
+
+            },
+            filter(filter, call) {
+
+                this.filterControl = true;
+                let newData
+
+                if (typeof (filter) == 'string') {
+
+                    filter = filter.trim().split(' ');
+
+                    newData = this.arg.source.filter((el) => {
+                        let concat = '';
+
+                        if (!this.arg.filter.concat.fields)
+                            this.arg.filter.concat.fields = Object.keys(el)
+
+                        this.arg.filter.concat.fields.forEach((ln) => {
+                            concat += el[ln] + ' ';
+                        })
+
+                        let retorno = 0;
+
+                        filter.forEach(ln => {
+                            if (this.arg.filter.filterBegin)
+                                if (concat.toString().toUpperCase().indexOf(ln.toUpperCase()) == 0)
+                                    retorno++;
+
+                            if (!this.arg.filter.filterBegin)
+                                if (concat.toString().toUpperCase().indexOf(ln.toUpperCase()) > -1)
+                                    retorno++;
+                        })
+
+                        if (this.arg.filter.concat.condicional == 'AND')
+                            if (filter.length == retorno)
+                                return true
+
+                        if (this.arg.filter.concat.condicional == 'OR')
+                            if (retorno > 0)
+                                return true
+
+                    });
+                } else
+                    if (typeof (filter) == 'object') {
+
+                        newData = this.arg.source.filter((el) => {
+
+                            let retorno = 0;
+
+                            for (let i in filter) {
+
+                                let field = i;
+                                let value = filter[i].toString().toUpperCase();
+
+                                if (el[field] == undefined) {
+                                    console.log('The field (' + field + ') not find');
+                                    return false;
+                                }
+
+                                if (this.arg.filter.filterBegin)
+                                    if (el[field].toString().toUpperCase().indexOf(value) == 0)
+                                        retorno++;
+
+                                if (!this.arg.filter.filterBegin)
+                                    if (el[field].toString().toUpperCase().indexOf(value) > -1)
+                                        retorno++;
+                            }
+
+                            if (this.arg.filter.fieldByField.condicional == 'AND')
+                                if (Object.keys(filter).length == retorno)
+                                    return true
+
+                            if (this.arg.filter.fieldByField.condicional == 'OR')
+                                if (retorno > 0)
+                                    return true
+                        });
+
+                    }
+
+                this.source(newData)
+                call && call(Object.keys(newData).length)
+
+                this.filterControl = false;
+
+            },
+            print(headHTML = '') {
+                let iframe = document.createElement('iframe');
+                iframe.setAttribute('name', 'iframe')
+                iframe.style = 'position:absolute; top:-100000px;'
+                // iframe.style = 'position:absolute; top:0px; width:100%; left:0; height:700px'
+                document.querySelector('body').appendChild(iframe);
+                let frameDoc = iframe.contentWindow ? iframe.contentWindow
+                    : iframe.contentDocument.document ? iframe.contentDocument.document
+                        : iframe.contentDocument;
+                frameDoc.document.open();
+                frameDoc.document.write('<html><head><title>Impressão de Documento</title>');
+                frameDoc.document.write(`<style>
+                *{border: 0;margin: 0;}
+                    body{
+                        background: #fff; 
+                        color: #000; 
+                        font: 8pt courier;
+                        height: 10%;
+                        page-break-before: always;
+                    }
+                </style>`);
+                let style = { ...document.querySelectorAll('link[rel=stylesheet]') }
+                for (let i in style) {
+                    if (style[i].outerHTML.indexOf('href') >= 0)
+                        frameDoc.document.write(style[i].outerHTML)
+                }
+                frameDoc.document.write('</head>');
+                frameDoc.document.write('<body>');
+
+                if (headHTML != '')
+                    frameDoc.document.write(headHTML);
+                else
+                    frameDoc.document.write(printHead);
+                frameDoc.document.write(`<div class="xGridV2-main x-print">${ax.element.innerHTML.trim()}</div>`);
+
+                frameDoc.document.write('</body></html>');
+
+                frameDoc.document.close();
+
+                setTimeout(function () {
+                    window.frames["iframe"].focus();
+                    window.frames["iframe"].print();
+                    iframe.remove();
+                }, 300);
             },
         }
 
@@ -1122,9 +1436,7 @@ export default (function() {
 
         ax.constructor();
 
-        this.getAx = () => ax;
-
-        this.version = () => version
+        this.getAx = () => ax
 
         this.source = (source) => ax.source(source)
 
@@ -1164,7 +1476,7 @@ export default (function() {
 
         this.clearElementSideBySide = () => ax.clearElementSideBySide()
 
-        this.queryOpen = (param) => ax.queryOpen(param)
+        this.queryOpen = (param, call) => ax.queryOpen(param, call)
 
         this.querySourceAdd = (source) => ax.querySourceAdd(source)
 
@@ -1174,13 +1486,22 @@ export default (function() {
 
         this.focusField = (name) => ax.focusField(name)
 
+        this.filter = (filter, call) => ax.filter(filter, call)
+
         this.disabledBtnsSalvarCancelar = (disabled) => ax.disabledBtnsSalvarCancelar(disabled)
 
+        this.disableFieldsSideBySide = (disabled) => ax.disableFieldsSideBySide(disabled)
+
+        this.print = (headHTML) => ax.print(headHTML)
+
     }
-
-
     return {
         create: create,
-        state: state
+        state: state,
+        version: version,
+        setNotFound: (value) => { notFound = value },
+        getNotFound: () => notFound,
+        getPrintHead: () => printHead,
+        setPrintHead: (html) => { printHead = html },
     }
 })();
