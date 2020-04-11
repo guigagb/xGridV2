@@ -192,6 +192,7 @@ Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro 
         <td align="center"></td>
     </tr>
 </table>
+<br>
 <table>
     <td width="20%"><strong>Columns</strong></td>
         <td  width="50%">Define as colunas que serão apresentadas no grid e como será personalizado os dados daquela coluna.<br>
@@ -273,8 +274,8 @@ columns: {
     }}
 })</pre>
                     </td>
-                    <td align="center">Boolean</td>
-                    <td align="center">False</td>
+                    <td align="center">String</td>
+                    <td align="center"></td>
                 </tr>
             </table>
         </td>
