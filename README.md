@@ -71,18 +71,24 @@ No javascript iremos instanciar o objeto da seguinte forma:
     <tr>
         <th>Gray</th>
         <th>Dark</th>
-        <th>Opacity</th>
-        <th>White</th>
     </tr>
     <tr>
         <td><img src="images/x-grayV2.png"></td>
         <td><img src="images/x-darkV2.png"></td>
-        <td><img src="images/x-opaciteV2.png"></td>
-        <td><img src="images/x-whiteV2.png"></td>
     </tr>
     <tr>
         <td style="font-size: 10px; text-align:center; padding: 0px">x-grayV2</td>
         <td style="font-size: 10px; text-align:center; padding: 0px">x-darkV2</td>
+    </tr>
+     <tr>
+        <th>Opacity</th>
+        <th>White</th>
+    </tr>
+    <tr>
+        <td><img src="images/x-opaciteV2.png"></td>
+        <td><img src="images/x-whiteV2.png"></td>
+    </tr>
+    <tr>
         <td style="font-size: 10px; text-align:center; padding: 0px">x-opaciteV2</td>
         <td style="font-size: 10px; text-align:center; padding: 0px">x-whiteV2</td>
     </tr>
