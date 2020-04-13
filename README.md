@@ -80,6 +80,8 @@ No javascript iremos instanciar o objeto da seguinte forma:
         <td style="font-size: 10px; text-align:center; padding: 0px">x-grayV2</td>
         <td style="font-size: 10px; text-align:center; padding: 0px">x-darkV2</td>
     </tr>
+</table>
+<table>
      <tr>
         <th>Opacity</th>
         <th>White</th>
@@ -200,6 +202,31 @@ Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro 
 </table>
 <br>
 <table>
+    <td width="20%" id="tdCreateCompare"><strong>Compare</strong></td>
+        <td  width="50%">Armazena funções que serão utilizadas em uma ou mais colunas para editar seu conteúdo.<br>
+        As funções possuem um parâmetro de callback que retorna todas as colunas e seus valores, e uma propriedade value que retorna o valor da coluna que está sendo executada a função.
+        </td>
+        <td align="center" width="15%">Object</td>
+        <td align="center" width="15%"></td>
+    </tr>
+    <tr>
+        <td colspan=4>
+        <pre>
+    const grid = new xGridV2.create({
+        compare: {
+            'joinName': (r) => {
+                return r.fistName + r.lastName;
+            },
+        },
+        columns: {
+            'name' : {dataField: 'firstName', compare: 'joinName'},
+        }
+    })
+        </pre>
+        </td>
+    </tr>
+</table>
+<table>
     <td width="20%"><strong>Columns</strong></td>
         <td  width="50%">Define as colunas que serão apresentadas no grid e como será personalizado os dados daquela coluna.<br>
         Caso não seja informado o componente irá considerar todas as colunas que vierem nos dados que serão adicionados ao grid.</td>
@@ -272,7 +299,7 @@ columns: {
                 </tr>
                 <tr>
                     <td>compare</td>
-                    <td>Informa o nome da função fornecida em <a href="#compare">compare</a> do create que deseja aplicar a esta coluna.
+                    <td>Informa o nome da função fornecida em <a href="#tdCreateCompare">compare</a> do create que deseja aplicar a esta coluna.
 <pre>grid = new xGrid.create({
     columns: {'Name': {dataField: 'NAME', compare: 'reverse'},},
     compare: {'reverse': (r)=>{
