@@ -202,12 +202,12 @@ Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro 
 </table>
 <br>
 <table>
-    <td width="20%" id="tdCreateCompare"><strong>Compare</strong></td>
-        <td  width="50%">Armazena funções que serão utilizadas em uma ou mais colunas para editar seu conteúdo.<br>
+    <td id="tdCreateCompare"><strong>Compare</strong></td>
+        <td>Armazena funções que serão utilizadas em uma ou mais colunas para editar seu conteúdo.<br>
         As funções possuem um parâmetro de callback que retorna todas as colunas e seus valores, e uma propriedade value que retorna o valor da coluna que está sendo executada a função.
         </td>
-        <td align="center" width="15%">Object</td>
-        <td align="center" width="15%"></td>
+        <td align="center">Object</td>
+        <td align="center"></td>
     </tr>
     <tr>
         <td colspan=4>
@@ -226,6 +226,7 @@ Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro 
         </td>
     </tr>
 </table>
+<br>
 <table>
     <td><strong>Columns</strong></td>
         <td>Define as colunas que serão apresentadas no grid e como será personalizado os dados daquela coluna.<br>
