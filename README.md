@@ -414,8 +414,8 @@ grid = new xGrid.create({
     query: {
         endScroll: 0.1,
         execute: (r)=>{
-            fetch('https://www.googleapis.com/books/v1/
-            volumes?q=sherlock+holmes?q='+r.param.desc + '&startIndex=' + r.offset + '&maxResults='  + r.param.maxItem )
+            fetch('https://www.googleapis.com/books/v1/volumes
+            ?q='+r.param.desc + '&startIndex=' + r.offset + '&maxResults='  + r.param.maxItem )
             .then(response => {
                 return response.json();
             })
@@ -425,7 +425,7 @@ grid = new xGrid.create({
         }
     }
 })</pre>
-            <blockquote>Ao usar o query iniciar a busca dos dados com o método <a hre="#queryOpen">queryOpen()</a> .</blockquote>
+            <blockquote>Ao usar o query iniciar a busca dos dados com o método <a hreF="#queryOpen">queryOpen()</a> .</blockquote>
             <blockquote>A função chamada em execute quando processada tem que adicionar os dados no grid através do método <a href="#querySourceAdd">querySourceAdd()</a> .</blockquote>
             <table>
                 <tr>
