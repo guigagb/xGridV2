@@ -399,3 +399,55 @@ columns: {
         </td>
     </tr>
 </table>
+<br>
+<table>
+    <tr>
+        <td><strong>query</strong></td>
+        <td>Configura o componente para uma pesquisa com paginação.</td>
+        <td align="center">Object</td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td colspan=4>
+            <pre>
+grid = new xGrid.create({
+    query: {
+        endScroll: 0.1,
+        execute: (r)=>{
+            fetch('https://www.googleapis.com/books/v1/volumes?q=sherlock+holmes?q='+r.param.desc + '&startIndex=' + r.offset + '&maxResults='  + r.param.maxItem )
+            .then(response => {
+                return response.json();
+            })
+            .then(result => {
+                grid.querySourceAdd(result.items);
+            })
+        }
+    }
+})</pre>
+            <blockquote>Ao usar o query iniciar a busca dos dados com o método <a hre="#queryOpen">queryOpen()</a> .</blockquote>
+            <blockquote>A função chamada em execute quando processada tem que adicionar os dados no grid através do método <a href="#querySourceAdd">querySourceAdd()</a> .</blockquote>
+            <table>
+                <tr>
+                    <td>endScroll</td>
+                    <td>Percentual correspondente a posição restante da barra de rolagem que buscará novos dados.</td>
+                    <td align="center">Object</td>
+                    <td align="center">0.1</td>
+                </tr>
+                <tr>
+                    <td>execute</td>
+                    <td>Função a ser executada para consultar novos dados, pode consumir um banco de dados, API, etc.<br><br>
+                    É executada sempre quando chegar no percentual da barra de rolagem determinada em endScroll.<br><br>
+                    A função possui um parâmetro callback que é um objeto contendo:
+                    <ul>
+                        <li>offset: A posição onde deve iniciar a pesquisa. O índice do primeiro item é 0.</li>
+                        <li>page: A página onde será feita a pesquisa. O índice da primeira página é 1.</li>
+                        <li>param: Objeto contendo informações adicionais para serem utilizadas na pesquisa.</li>
+                    </ul>
+                    </td>
+                    <td align="center">Function<br>(Callback)</td>
+                    <td align="center">Undefined</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
