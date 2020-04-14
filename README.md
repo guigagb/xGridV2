@@ -347,3 +347,55 @@ columns: {
         </td>
     </tr>
 </table>
+<br>
+<table>
+    <tr>
+        <td><strong>Filter</strong></td>
+        <td>Define regras que serão utilizadas no filtro interno do grid quando executar o método filter.</td>
+        <td align="center">Object</td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td colspan=4>
+            <table>
+                <tr>
+                    <th>Propriedade</th>
+                    <th>Descrição</th>
+                    <th>Tipo</th>
+                    <th>Default</th>
+                </tr>
+                <tr>
+                    <pre>   grid = new xGrid.create({
+            filter: {
+                filterBegin: false,
+                fieldByField: {condicional: 'OR'},
+                concat: {
+                    fields: [],
+                    condicional: 'OR'
+                }
+            },
+        })</pre>
+                    <td>filterBegin</td>
+                    <td>O texto pesquisado tem que ser igual ao texto inicial da(s) coluna(s)</td>
+                    <td align="center">Boolean</td>
+                    <td align="center">False</td>
+                </tr>
+                <tr>
+                    <td>fields</td>
+                    <td>Array com o nome das colunas (dataField) em que deseja que a pesquisa seja realizada.<br>
+                    Se não for informado irá pesquisar em todas as colunas.
+                    </td>
+                    <td align="center">Array</td>
+                    <td align="center">[  ]</td>
+                </tr>
+                <tr>
+                    <td>condicional</td>
+                    <td>Operador que determina se a pesquisa deve atender todas as colunas informadas ('AND') ou se deve atender pelo menos uma das colunas ('OR')<br>
+                    </td>
+                    <td align="center">String</td>
+                    <td align="center">'OR'</td>
+                </tr>  
+            </table>
+        </td>
+    </tr>
+</table>
