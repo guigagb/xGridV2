@@ -202,7 +202,38 @@ Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro 
 </table>
 <br>
 <table>
-    <td id="tdCreateCompare"><strong>Compare</strong></td>
+    <tr>
+        <td><strong>onKeyDown</strong></td>
+        <td>Armazena funções que executam determinada ação ao pressionar uma tecla desejada na linha do grid.<br>
+        As funções possuem dois parâmetros de callback:<br>
+        O <u>primeiro</u> retorna todos os campos e valores daquela linha.<br>
+        O <u>segundo</u> retorna o evento keydown do DOM.
+        </td>
+        <td align="center">Object</td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td colspan=4>
+        <pre>
+    const grid = new xGridV2.create({
+        onKeyDown: {
+            70: (ln,e) => {
+                alert('Letra F pressionada');
+            },
+            'ctrl+13': (ln,e) => {
+                alert('CTRL + Enter pressionado');
+            },
+        },
+    })</pre>
+        <blockquote>A chave do objeto deve ser o keyCode da tecla que deseja monitorar.</blockquote>
+        <blockquote>Pode combinar as palavras ctrl, alt e shift com um sinal de '+' .</blockquote>
+        </td>
+    </tr>
+</table>
+<br>
+<table>
+    <tr>
+        <td id="tdCreateCompare"><strong>Compare</strong></td>
         <td>Armazena funções que serão utilizadas em uma ou mais colunas para editar seu conteúdo.<br>
         As funções possuem um parâmetro de callback que retorna todas as colunas e seus valores, e uma propriedade value que retorna o valor da coluna que está sendo executada a função.
         </td>
@@ -215,7 +246,7 @@ Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro 
     const grid = new xGridV2.create({
         compare: {
             'joinName': (r) => {
-                return r.fistName + r.lastName;
+                return r.firstName + r.lastName;
             },
         },
         columns: {
@@ -228,7 +259,8 @@ Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro 
 </table>
 <br>
 <table>
-    <td><strong>Columns</strong></td>
+    <tr>
+        <td><strong>Columns</strong></td>
         <td>Define as colunas que serão apresentadas no grid e como será personalizado os dados daquela coluna.<br>
         Caso não seja informado o componente irá considerar todas as colunas que vierem nos dados que serão adicionados ao grid.</td>
         <td align="center">Object</td>
