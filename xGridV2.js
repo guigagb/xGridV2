@@ -1,6 +1,6 @@
-export default (function() {
-// eslint-disable-next-line no-unused-vars
-// let xGridV2 = (function () {
+export default (function () {
+    // eslint-disable-next-line no-unused-vars
+    // let xGridV2 = (function () {
     const version = 2.0;
     const state = { save: 'save', insert: 'insert', update: 'update', select: 'select', cancel: 'cancel', delete: 'delete' }
     let notFound = 'Nada Localizado'
@@ -17,12 +17,14 @@ export default (function() {
             multiSelect: false,
             render: {},
             theme: 'x-grayV2',
-            sideBySide: false,
             click: false,
             dblClick: false,
             enter: false,
             count: false,
             title: true,
+            complete: false,
+            onKeyDown: false,
+            compare: {},
             columns: {},
             filter: {
                 filterBegin: false,
@@ -34,16 +36,13 @@ export default (function() {
                     condicional: 'OR'
                 }
             },
-            compare: {},
             query: {
                 endScroll: 0.1,
                 execute: false,
             },
-            afterSearch: false,
-            duplicity: false,
-            frame: false,
-            complete: false,
-            keyDown: false,
+            sideBySide: false,
+            // afterSearch: false, não implementada
+            // frame: false,
         };
 
         param = Object.assign({}, param);
@@ -64,6 +63,7 @@ export default (function() {
             widthAll: 0,
             columnsAutoCreate: [],
             tabindex: 0,
+            page: 1,
             sourceSelect: false,
             indexSelect: false,
             gridDisable: null,
@@ -371,15 +371,48 @@ export default (function() {
                     if (this.gridContent.querySelector('nav'))
                         this.gridContent.querySelector('nav').remove()
                 } else
-                    if (!this.gridContent.querySelector('nav')) {
-                        let nav = document.createElement('nav')
-                        nav.innerHTML = notFound
-                        this.gridContent.appendChild(nav)
-                    }
+                    if (this.arg.query.execute == false)
+                        if (!this.gridContent.querySelector('nav')) {
+                            let nav = document.createElement('nav')
+                            nav.innerHTML = notFound
+                            this.gridContent.appendChild(nav)
+                        }
 
 
                 this.closeLoad()
                 this.loadMore(false)
+            },
+            setaForUp(e) {
+                if (ax.widthAll <= 100) {
+                    if (ax.gridContent.scrollTop > 0)
+                        ax.gridContent.scrollTop = ax.gridContent.scrollTop - 1;
+                } else {
+                    let scroll = ax.element.scrollTop
+                    if (scroll > 0) {
+                        let rowHeight = e.target.offsetHeight
+                        ax.element.scrollTop = (scroll - rowHeight);
+                    }
+                }
+
+                if (e.target.previousSibling)
+                    e.target.previousSibling.focus()
+
+                if (e.preventDefault)
+                    e.preventDefault();
+                if (e.stopPropagation)
+                    e.stopPropagation();
+            },
+            setaForDown(e) {
+                if (ax.widthAll <= 100)
+                    ax.gridContent.scrollTop = ax.gridContent.scrollTop + 1
+                else
+                    ax.element.scrollTop = ax.element.scrollTop + 1
+
+                if (e.target.nextSibling)
+                    e.target.nextSibling.focus()
+
+                e.preventDefault();
+                e.stopPropagation();
             },
             onEvent: {
                 _control: false,
@@ -392,45 +425,12 @@ export default (function() {
                 },
                 keydown(e) {
                     // seta para cima
-                    if (e.keyCode == 38) {
-
-                        if (ax.widthAll <= 100) {
-                            if (ax.gridContent.scrollTop > 0)
-                                ax.gridContent.scrollTop = ax.gridContent.scrollTop - 1;
-                        } else {
-                            let scroll = ax.element.scrollTop
-                            if (scroll > 0) {
-                                let rowHeight = e.target.offsetHeight
-                                ax.element.scrollTop = (scroll - rowHeight);
-                            }
-                        }
-
-
-                        if (e.target.previousSibling)
-                            e.target.previousSibling.focus()
-
-
-                        if (e.preventDefault)
-                            e.preventDefault();
-                        if (e.stopPropagation)
-                            e.stopPropagation();
-                    }
+                    if (e.keyCode == 38)
+                        ax.setaForUp(e)
 
                     // seta para baixo
-                    if (e.keyCode == 40) {
-
-                        if (ax.widthAll <= 100)
-                            ax.gridContent.scrollTop = ax.gridContent.scrollTop + 1
-                        else
-                            ax.element.scrollTop = ax.element.scrollTop + 1
-
-
-                        if (e.target.nextSibling)
-                            e.target.nextSibling.focus()
-
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
+                    if (e.keyCode == 40)
+                        ax.setaForDown(e)
 
                     // page up
                     if (e.keyCode == 33) {
@@ -636,7 +636,8 @@ export default (function() {
                 if (ax.controlScroll)
                     if ((target.offsetHeight + target.scrollTop >= h)) {
                         ax.loadMore()
-                        ax.arg.query.execute(ax.tabindex, ax.paramQuery)
+                        ax.page++;
+                        ax.arg.query.execute({ offset: ax.tabindex, page: ax.page, param: ax.paramQuery })
                         ax.controlScroll = false
                     }
             },
@@ -794,17 +795,19 @@ export default (function() {
                     let key = ctrlKey + shiftKey + altKey + e.keyCode;
 
                     if (key == 13) {
-                        if (this.arg.enter)
+                        if (this.arg.enter) {
                             this.arg.enter(this.sourceSelect, e)
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
                     }
 
                     if (this.arg.onKeyDown)
-                        if (this.arg.onKeyDown[key])
+                        if (this.arg.onKeyDown[key]) {
                             this.arg.onKeyDown[key](this.sourceSelect, e)
-
-                    e.preventDefault();
-                    e.stopPropagation();
-
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
                 })
             },
             onSelectLine() {
@@ -1006,7 +1009,7 @@ export default (function() {
             queryOpen(param, call) {
                 this.paramQuery = param
                 this.tabindex = 0
-                this.arg.query.execute(this.tabindex, param)
+                this.arg.query.execute({ offset: this.tabindex, page: ax.page, param: param })
                 call && call()
             },
             frame() {
@@ -1321,9 +1324,12 @@ export default (function() {
                             concat += el[ln] + ' ';
                         })
 
+
                         let retorno = 0;
 
                         filter.forEach(ln => {
+                            console.log(concat.toString().toUpperCase().indexOf(ln.toUpperCase()));
+
                             if (this.arg.filter.filterBegin)
                                 if (concat.toString().toUpperCase().indexOf(ln.toUpperCase()) == 0)
                                     retorno++;
@@ -1391,9 +1397,9 @@ export default (function() {
                 iframe.style = 'position:absolute; top:-100000px;'
                 // iframe.style = 'position:absolute; top:0px; width:100%; left:0; height:700px'
                 document.querySelector('body').appendChild(iframe);
-                let frameDoc = iframe.contentWindow ? iframe.contentWindow
-                    : iframe.contentDocument.document ? iframe.contentDocument.document
-                        : iframe.contentDocument;
+                let frameDoc = iframe.contentWindow ? iframe.contentWindow :
+                    iframe.contentDocument.document ? iframe.contentDocument.document :
+                        iframe.contentDocument;
                 frameDoc.document.open();
                 frameDoc.document.write('<html><head><title>Impressão de Documento</title>');
                 frameDoc.document.write(`<style>
@@ -1493,6 +1499,10 @@ export default (function() {
         this.disableFieldsSideBySide = (disabled) => ax.disableFieldsSideBySide(disabled)
 
         this.print = (headHTML) => ax.print(headHTML)
+
+        this.selectUp = (event) => ax.setaForUp(event)
+
+        this.selectDown = (event) => ax.setaForDown(event)
 
     }
     return {
