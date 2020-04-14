@@ -414,7 +414,8 @@ grid = new xGrid.create({
     query: {
         endScroll: 0.1,
         execute: (r)=>{
-            fetch('https://www.googleapis.com/books/v1/volumes?q=sherlock+holmes?q='+r.param.desc + '&startIndex=' + r.offset + '&maxResults='  + r.param.maxItem )
+            fetch('https://www.googleapis.com/books/v1/
+            volumes?q=sherlock+holmes?q='+r.param.desc + '&startIndex=' + r.offset + '&maxResults='  + r.param.maxItem )
             .then(response => {
                 return response.json();
             })
