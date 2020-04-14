@@ -424,7 +424,9 @@ grid = new xGrid.create({
             })
         }
     }
-})</pre>
+})
+<br>
+grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
             <blockquote>Ao usar o query iniciar a busca dos dados com o método <a hreF="#queryOpen">queryOpen()</a> .</blockquote>
             <blockquote>A função chamada em execute quando processada tem que adicionar os dados no grid através do método <a href="#querySourceAdd">querySourceAdd()</a> .</blockquote>
             <table>
