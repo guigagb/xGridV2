@@ -145,7 +145,7 @@ Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro 
     </tr>
     <tr>
         <td>theme</td>
-        <td>Informe a classe do tema que deseja utilizar. Lista de temas disponíves <a href=#temas>acima</a>.</td>
+        <td>Informe a classe do tema que deseja utilizar. Lista de <a href=#temas>temas</a> disponíves acima.</td>
         <td align="center">String</td>
         <td align="center">x-grayV2</td>
     </tr>
@@ -350,7 +350,7 @@ columns: {
 <br>
 <table>
     <tr>
-        <td><strong>Filter</strong></td>
+        <td id="filter"><strong>Filter</strong></td>
         <td>Define regras que serão utilizadas no filtro interno do grid quando executar o método filter.</td>
         <td align="center">Object</td>
         <td align="center"></td>
@@ -368,14 +368,14 @@ columns: {
                     <pre>   grid = new xGrid.create({
             filter: {
                 filterBegin: false,
-                fieldByField: {condicional: 'OR'},
+                fieldByField: {conditional: 'OR'},
                 concat: {
                     fields: [],
-                    condicional: 'OR'
+                    conditional: 'OR'
                 }
             },
         })</pre>
-                    <td>filterBegin</td>
+                    <td id="filterBegin">filterBegin</td>
                     <td>O texto pesquisado tem que ser igual ao texto inicial da(s) coluna(s)</td>
                     <td align="center">Boolean</td>
                     <td align="center">False</td>
@@ -389,7 +389,7 @@ columns: {
                     <td align="center">[  ]</td>
                 </tr>
                 <tr>
-                    <td>condicional</td>
+                    <td id="filterConditional">conditional</td>
                     <td>Operador que determina se a pesquisa deve atender todas as colunas informadas ('AND') ou se deve atender pelo menos uma das colunas ('OR')<br>
                     </td>
                     <td align="center">String</td>
@@ -402,7 +402,7 @@ columns: {
 <br>
 <table>
     <tr>
-        <td><strong>query</strong></td>
+        <td id="query"><strong>query</strong></td>
         <td>Configura o componente para uma pesquisa com paginação.</td>
         <td align="center">Object</td>
         <td align="center"></td>
@@ -413,15 +413,13 @@ columns: {
 grid = new xGrid.create({
     query: {
         endScroll: 0.1,
-        execute: (r)=>{
-            fetch('https://www.googleapis.com/books/v1/volumes
-            ?q='+r.param.desc + '&startIndex=' + r.offset + '&maxResults='  + r.param.maxItem )
+        execute: async (r) => {
+            let result = await fetch('https://www.googleapis.com/books/v1/volumes
+            ?q=' + r.param.desc + '&startIndex=' + r.offset + '&maxResults=' + r.param.maxItem )
             .then(response => {
                 return response.json();
             })
-            .then(result => {
-                grid.querySourceAdd(result.items);
-            })
+            grid.querySourceAdd(result.items);
         }
     }
 })
@@ -440,17 +438,248 @@ grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
                     <td>execute</td>
                     <td>Função a ser executada para consultar novos dados, pode consumir um banco de dados, API, etc.<br><br>
                     É executada sempre quando chegar no percentual da barra de rolagem determinada em endScroll.<br><br>
-                    A função possui um parâmetro callback que é um objeto contendo:
-                    <ul>
-                        <li>offset: A posição onde deve iniciar a pesquisa. O índice do primeiro item é 0.</li>
-                        <li>page: A página onde será feita a pesquisa. O índice da primeira página é 1.</li>
-                        <li>param: Objeto contendo informações adicionais para serem utilizadas na pesquisa.</li>
-                    </ul>
+                    A função possui um parâmetro callback que é um objeto contendo:<br>
+                    <u>offset</u>: A posição onde deve iniciar a pesquisa. O índice do primeiro item é 0.<br>
+                    <u>page</u>: A página onde será feita a pesquisa. O índice da primeira página é 1.<br>
+                    <u>param</u>: Objeto contendo informações adicionais para serem utilizadas na pesquisa.
                     </td>
                     <td align="center">Function<br>(Callback)</td>
                     <td align="center">Undefined</td>
                 </tr>
             </table>
+        </td>
+    </tr>
+</table>
+
+## Métodos
+    
+Esses métodos serão utilizados no grid instanciado. Ex.:<br>
+```javascript
+    grid.deleteLine(1);
+```
+
+<table>
+    <tr>
+        <th>Método</th>
+        <th align="center">Parâmetro</th>
+        <th>Descrição</th>
+    <tr>
+    <tr>
+        <td>source</td>
+        <td align="center">source: Array of Object</td>
+        <td>Preenche o grid com os dados passados via parâmetro.</td>
+    </tr>
+    <tr>
+        <td>sourceAdd</td>
+        <td align="center">source: Array of Object</td>
+        <td>Insere os dados passados via parâmetro no grid.</td>
+    </tr>
+    <tr>
+        <td>dataSource</td>
+        <td align="center">nenhum</td>
+        <td>Retorna os dados da linha selecionada.<br>
+        Caso nenhuma linha tenha sido selecionada, retorna false.
+        </td>
+    </tr>
+    <tr>
+        <td>dataSource</td>
+        <td align="center">field: String</td>
+        <td>Retorna o valor da coluna informada por parâmetro na linha selecionada.</td>
+    </tr>
+    <tr>
+        <td>dataSource</td>
+        <td align="center">field: String<br>value: String</td>
+        <td>Altera o valor da coluna informada pelo valor passado, na linha selecionada.</td>
+    </tr>
+    <tr>
+        <td>data</td>
+        <td align="center">nenhum</td>
+        <td>Retorna todos os dados armazenados no grid.</td>
+    </tr>
+    <tr>
+        <td>getColumns</td>
+        <td align="center">nenhum</td>
+        <td>Retorna as informações da propriedade 'columns' do grid.</td>
+    </tr>
+    <tr>
+        <td>getCompare</td>
+        <td align="center">nenhum</td>
+        <td>Retorna as informações da propriedade 'compare' do grid.</td>
+    </tr>
+    <tr>
+        <td>focus</td>
+        <td align="center">numLine: Integer</td>
+        <td>Foca na linha informada. Primeira linha iniciada por 0.</td>
+    </tr>
+    <tr>
+        <td>disable</td>
+        <td align="center">callback: Function<br>(Optional)</td>
+        <td>Desabilita o grid, executa a função callback caso tenha sido passada.</td>
+    </tr>
+    <tr>
+        <td>enable</td>
+        <td align="center">callback: Function<br>(Optional)</td>
+        <td>Habilita o grid, executa a função callback caso tenha sido passada.</td>
+    </tr>
+    <tr>
+        <td>clear</td>
+        <td align="center">callback: Function<br>(Optional)</td>
+        <td>Apaga os dados do grid (visual). Os dados permanecem armazendados no grid. Executa a função callback caso tenha sido passada.</td>
+    </tr>
+    <tr>
+        <td>load</td>
+        <td align="center">nenhum</td>
+        <td>Mostra uma mensagem de loading no grid.</td>
+    </tr>
+    <tr>
+        <td>load</td>
+        <td align="center">text: String</td>
+        <td>Mostra a mensagem fornecida como um loading no grid.</td>
+    </tr>
+    <tr>
+        <td>load</td>
+        <td align="center">text: String,<br>
+            callback: Function
+        </td>
+        <td>Mostra a mensagem fornecida como um loading no grid. Executa a função callback fornecida.</td>
+    </tr>
+    <tr>
+        <td>closeLoad</td>
+        <td align="center">callback: Function<br>(Optional)</td>
+        <td>Oculta a mensagem de loading do grid. Executa a função callback caso tenha sido passada.</td>
+    </tr>
+    <tr>
+        <td>getIndex</td>
+        <td align="center">nenhum</td>
+        <td>Retorna o índice da linha atual. A primeira linha se inicia com 0.</td>
+    </tr>
+    <tr>
+        <td>deleteLine</td>
+        <td align="center">index: Integer <br>(Optional)</td>
+        <td>Deleta a linha informada, caso não informe a linha, será deletado a linha selecionada.<br>
+        Essa função tem como retorno os dados da linha deletada.
+        </td>
+    </tr>
+    <tr>
+        <td>insertLine</td>
+        <td align="center">param: Object</td>
+        <td>Insere uma linha com os dados passados no final do grid.
+        </td>
+    </tr>
+    <!-- <tr>
+        <td>insertLine</td>
+        <td align="center">param: <br>Object, <br>order: </td>
+        <td>
+        </td>
+    </tr>
+    <tr>
+        <td>insertLine</td>
+        <td align="center">
+        param: <br>
+        Object,<br>
+        order: <br>
+        type, <br>
+        callback: <br>
+        Function <br>
+        </td>
+        <td>
+        </td>
+    </tr> -->
+    <tr>
+        <td>sumDataField</td>
+        <td align="center">field: String</td>
+        <td>Retorna o total da soma da coluna informada.
+        </td>
+    </tr>
+    <tr>
+        <td>queryOpen</td>
+        <td align="center">param: Object,<br>
+        callback: Function<br>
+        (Optional)
+        </td>
+        <td>Faz uma consulta inicial com base na propriedade <a href="#query">query</a>. As demais consultas são feitas com paginação através da query. Executa uma função callback caso tenha sido fornecida. (<a href="query">query</a>)</td>
+    </tr>
+    <tr>
+        <td>querySourceAdd</td>
+        <td align="center">source: Array of Object
+        </td>
+        <td>Adiciona os dados passados no grid.  (<a href="query">query</a>)</td>
+    </tr>
+    <tr>
+        <td>focusField</td>
+        <td align="center">name: String</td>
+        <td>Foca em um campo específico do formulário.  (<a href="sideBySide">sideBySide</a>)</td>
+    </tr>
+    <tr>
+        <td>filter</td>
+        <td align="center">filter: String,<br>
+        callback: Function (Optional)
+        </td>
+        <td>Pesquisa e filtra no grid o texto passado. A pesquisa obedece a condição informada na propriedade <a href="#filter">filter</a>.<br>
+        Executa uma função callback caso tenha sido fornecida, essa função callback têm como parâmetro de retorno a quantidade de linhas encontradas. (<a href="filter">filter</a>)
+    </tr>
+    <tr>
+        <td>filter</td>
+        <td align="center">filter: Object,<br>
+        callback: Function (Optional)
+        </td>
+        <td>Pesquisa nas colunas informadas os respectivos valores informados. Ex.:<br>
+        <code>grid.filter({name: 'Robert' lastName: 'Drummond'})</code><br>
+         A pesquisa obedece a condição informada na propriedade <a href="#filter">filter</a>.<br>
+        Executa uma função callback caso tenha sido fornecida, essa função callback têm como parâmetro de retorno a quantidade de linhas encontradas. (<a href="filter">filter</a>)
+    </tr>
+    <tr>
+        <td>setFilterBegin</td>
+        <td align="center">filterBegin: Boolean</td>
+        <td>Altera a propriedade <a href="#filterBegin">filterBegin</a> do filter. (<a href="filter">filter</a>)
+    </tr>
+    <tr>
+        <td>setFilterConditional</td>
+        <td align="center">conditional: String</td>
+        <td>Altera a propriedade <a href="#filterConditional">conditional</a> do filter. (<a href="filter">filter</a>)
+    </tr>
+    <tr>
+        <td>disableBtnsSalvarCancelar</td>
+        <td align="center">disable: Boolean
+        </td>
+        <td>Desabilita/Habilita os botões salvar e cancelar de acordo com a informação passada. (<a href="frame">frame</a>)
+        </td>
+    </tr>
+    <tr>
+        <td>disableFieldsSideBySide</td>
+        <td align="center">disable: Boolean
+        </td>
+        <td>Desabilita/Habilita os campos do formulário. (<a href="frame">sideBySide</a>)
+        </td>
+    </tr>
+    <tr>
+        <td>getElementSideBySideJson</td>
+        <td align="center">toUpperCase: Boolean,<br>
+        empty: Boolean
+        </td>
+        <td>Retorna os valores dos campos do formulário no formato JSON. (<a href="frame">sideBySide</a>)
+        </td>
+    </tr>
+    <tr>
+        <td>getDiffTwoJson</td>
+        <td align="center">toUpperCase: Boolean</td>
+        <td>Retorna um objeto contendo os valores antigos e novos dos campos alterados no formulário.<br>
+        <code> {objOld: [name: 'Robert'], objNew: [name: 'Roberty']}</code>
+        (<a href="frame">sideBySide</a>)
+        </td>
+    </tr>
+    <tr>
+        <td>clearElementSideBySide</td>
+        <td align="center">nenhum</td>
+        <td>Limpa os campos do formulário.
+        (<a href="frame">sideBySide</a>)
+        </td>
+    </tr>
+    <tr>
+        <td>print</td>
+        <td align="center">headHTML: String (Optional)
+        </td>
+        <td>Imprime os dados do grid. É possível passar um cabeçalho para impressão via parâmetro.
         </td>
     </tr>
 </table>
