@@ -938,4 +938,14 @@ Esses métodos serão utilizados no grid instanciado. Ex.:<br>
         <td align="center">text: String</td>
         <td>Mostra uma mensagem de alerta!</td>
     </tr>
+    <tr>
+        <td>setKeySelectUp</td>
+        <td align="center">keyCode: Integer</td>
+        <td>Adiciona a opção de selecionar a linha acima com a tecla informada.</td>
+    </tr>
+    <tr>
+        <td>setKeySelectDown</td>
+        <td align="center">keyCode: Integer</td>
+        <td>Adiciona a opção de selecionar a linha abaixo com a tecla informada.</td>
+    </tr>
 </table>
