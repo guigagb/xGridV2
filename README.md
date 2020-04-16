@@ -429,6 +429,12 @@ grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
             <blockquote>A função chamada em execute quando processada tem que adicionar os dados no grid através do método <a href="#querySourceAdd">querySourceAdd()</a> .</blockquote>
             <table>
                 <tr>
+                    <th>Propriedade</th>
+                    <th>Descrição</th>
+                    <th>Tipo</th>
+                    <th>Default</th>
+                </tr>
+                <tr>
                     <td>endScroll</td>
                     <td>Percentual correspondente a posição restante da barra de rolagem que buscará novos dados.</td>
                     <td align="center">Object</td>
@@ -445,6 +451,232 @@ grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
                     </td>
                     <td align="center">Function<br>(Callback)</td>
                     <td align="center">Undefined</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<br>
+<table>
+    <tr>
+        <td id="sideBySide"><strong>sideBySide</strong></td>
+        <td>Possibilita vincular as colunas do grid com os elementos do formulário (input, checkbox, textarea, etc..).</td>
+        <td align="center">Object</td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td colspan=4>
+            <pre>       const grid = new xGrid({
+                sideBySide: {
+                    el: '#myForm'
+                }
+            })
+            <blockquote>O vínculo só é feito se o <strong>name</strong> dos elementos (input, etc..) for igual ao <strong>dataField</strong> de columns.</blockquote></pre>
+            <table>
+                <tr>
+                    <th>Propriedade</th>
+                    <th>Descrição</th>
+                    <th>Tipo</th>
+                    <th>Default</th>
+                </tr>
+                <tr>
+                    <td>el <strong>(Obrigatório)</strong></td>
+                    <td>Informe o id ou class do form ou div dos elementos de entrada.</td>
+                    <td align="center">String</td>
+                    <td align="center">Undefined</td>
+                </tr>
+                <tr>
+                    <td>render</strong></td>
+                    <td>Recebe um objeto, sendo a chave do objeto o 'name' do elemento e o valor uma função callback que recebe o valor do elemento e retorna um valor modificado pela função.
+                     <pre>... sideBySide: {
+        el: '#myForm',
+        render: {
+            name: (value) => {return value.split('').reverse().join('')},
+            money: (value) => formatMoney
+        }
+    }, </pre>
+                    </td>
+                    <td align="center">Object</td>
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td>compare</strong></td>
+                    <td>Recebe um objeto, sendo a chave do objeto o 'name' do elemento e o valor o nome da função fornecida em <a href="#tdCreateCompare">compare</a> do create.
+<pre>grid = new xGrid.create({
+    compare: {'joinName': (r)=>{
+        return r.firstName + ' ' + r.lastName;
+    }},
+    sideBySide: {
+        el: '#myForm',
+        compare: {
+            firstName: 'joinName',
+        }
+    }
+})</pre>
+                    </td>
+                    <td align="center">Object</td>
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td id="frame"><strong>frame</strong></td>
+                    <td>Possibilita a criação de botões que estarão vinculados com o formulário.</td>
+                    <td align="center">Object</td>
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td colspan=4>
+            <pre>
+            const grid = new xGrid.create({
+                sideBySide:{
+                    frame: {
+                        el: '#divButtons',
+                        buttons: {
+                            ...
+                        }
+                    }
+                }
+            })</pre>
+                        <table>
+                            <tr>
+                                <th>Propriedade</th>
+                                <th>Descrição</th>
+                                <th>Tipo</th>
+                                <th>Default</th>
+                            </tr>
+                            <tr>
+                                <td>el<br>(Obrigatório)</td>
+                                <td>Id ou classe do elemento onde serão criados os botões.</td>
+                                <td align="center">String</td>
+                                <td align="center"></td>
+                            </tr>
+                            <tr>
+                                <td>class</td>
+                                <td>Informa uma classe para o container.</td>
+                                <td align="center">String</td>
+                                <td align="center"></td>
+                            </tr>
+                            <tr>
+                                <td>style</td>
+                                <td>Informa uma css para o container.</td>
+                                <td align="center">String</td>
+                                <td align="center"></td>
+                            </tr>
+                            <tr>
+                                <td>buttons</td>
+                                <td>Lista de objetos contendo os botões que serão criados.</td>
+                                <td align="center">Object</td>
+                                <td align="center"></td>
+                            </tr>
+                            <tr>
+                                <td colspan=4>
+                    <pre>
+                    frame: {
+                        el: '#divButtons',
+                        buttons: {
+                            insert: {
+                                html: 'Incluir',
+                                state: xGrid.state.insert,
+                                class: 'btnInsert',
+                                click: ()=>{ ... },
+                            },
+                            ...
+                        }
+                    }</pre>
+                    <blockquote>Ao clicar nos botões com state (insert, update), os fields são habilitados e os botões com state (update, cancel) são desabilitados. O contrário também se aplica.</blockquote>
+                                    <table>
+                                        <tr>
+                                            <th>Propriedade</th>
+                                            <th>Descrição</th>
+                                            <th>Tipo</th>
+                                            <th>Default</th>
+                                        </tr>
+                                        <tr>
+                                            <td>html</td>
+                                            <td>Texto que será exibido no botão.</td>
+                                            <td align="center">String</td>
+                                            <td align="center"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>state</td>
+                                            <td>Propriedade para controlar qual o tipo do botão sendo utilizado.<br>
+                                            <blockquote>state.insert, state.update, state.delete, state.save e state.cancel</blockquote>
+                                            </td>
+                                            <td align="center">state</td>
+                                            <td align="center"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>class</td>
+                                            <td>Fornece uma classe para o botão.</td>
+                                            <td align="center">String</td>
+                                            <td align="center"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>style</td>
+                                            <td>Fornece uma estilo para o botão.</td>
+                                            <td align="center">String</td>
+                                            <td align="center"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>click</td>
+                                            <td>Recebe uma função que será executada ao clicar no botão.
+                                            Possui um callback que retorna os dados da linha selecionada.</td>
+                                            <td align="center">Function<br>(callback)</td>
+                                            <td align="center"></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="duplicity"><strong>duplicity</strong></td>
+                    <td>Ao sair de um elemento verifica se o seu valor já está sendo utilizado em outro registro.</td>
+                    <td align="center">Object</td>
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td colspan=4>
+                        <pre> duplicity: {
+            dataField: ['id'],
+            execute: async (r) => {
+                let result = await fetch('https://www.googleapis.com/books/v1/volumes?q=' + r.value + '&maxResults=1')
+                    .then(response => {
+                        return response.json();
+                    })
+                if (result.totalItems > 0) {
+                    grid.showMessageDuplicity('O campo ' +r.text+ ' está com valor duplicado!')
+                    grid.focusField(r.field);
+                }
+            }
+        },</pre>
+                        <table>
+                            <tr>
+                                <th>Propriedade</th>
+                                <th>Descrição</th>
+                                <th>Tipo</th>
+                                <th>Default</th>
+                            </tr>
+                            <tr>
+                                <td>dataField</td>
+                                <td>Array contendo os nomes dos fields que deseja verificar se há duplicidade.</td>
+                                <td align="center">Array of String</td>
+                                <td align="center"></td>
+                            </tr>
+                            <tr>
+                                <td>execute</td>
+                                <td>Função a ser executada para verificar se o dado está duplicado.<br>
+                                É executada sempre quando o elemento do formulário perde o foco.<br>
+                                Possui um parâmetro callback que retorna um objeto contendo:<br>
+                                <u>field</u>: Nome do dataField do campo.<br>
+                                <u>value</u>: Valor alterado no elemento.<br>
+                                <u>text</u>: Texto do elemento anterior ou placeholder.
+                                </td>
+                                <td align="center">Function <br>(callback)</td>
+                                <td align="center"></td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
             </table>
         </td>
@@ -588,7 +820,7 @@ Esses métodos serão utilizados no grid instanciado. Ex.:<br>
     <tr>
         <td>sumDataField</td>
         <td align="center">field: String</td>
-        <td>Retorna o total da soma da coluna informada.
+        <td>Retorna a soma total da coluna informada.
         </td>
     </tr>
     <tr>
@@ -608,7 +840,7 @@ Esses métodos serão utilizados no grid instanciado. Ex.:<br>
     <tr>
         <td>focusField</td>
         <td align="center">name: String</td>
-        <td>Foca em um campo específico do formulário.  (<a href="sideBySide">sideBySide</a>)</td>
+        <td>Foca em um campo específico do formulário.  (<a href="#sideBySide">sideBySide</a>)</td>
     </tr>
     <tr>
         <td>filter</td>
@@ -642,14 +874,14 @@ Esses métodos serão utilizados no grid instanciado. Ex.:<br>
         <td>disableBtnsSalvarCancelar</td>
         <td align="center">disable: Boolean
         </td>
-        <td>Desabilita/Habilita os botões salvar e cancelar de acordo com a informação passada. (<a href="frame">frame</a>)
+        <td>Desabilita/Habilita os botões salvar e cancelar de acordo com a informação passada. (<a href="#frame">frame</a>)
         </td>
     </tr>
     <tr>
         <td>disableFieldsSideBySide</td>
         <td align="center">disable: Boolean
         </td>
-        <td>Desabilita/Habilita os campos do formulário. (<a href="frame">sideBySide</a>)
+        <td>Desabilita/Habilita os campos do formulário. (<a href="#sideBySide">sideBySide</a>)
         </td>
     </tr>
     <tr>
@@ -657,7 +889,7 @@ Esses métodos serão utilizados no grid instanciado. Ex.:<br>
         <td align="center">toUpperCase: Boolean,<br>
         empty: Boolean
         </td>
-        <td>Retorna os valores dos campos do formulário no formato JSON. (<a href="frame">sideBySide</a>)
+        <td>Retorna os valores dos campos do formulário no formato JSON. (<a href="#sideBySide">sideBySide</a>)
         </td>
     </tr>
     <tr>
@@ -665,14 +897,14 @@ Esses métodos serão utilizados no grid instanciado. Ex.:<br>
         <td align="center">toUpperCase: Boolean</td>
         <td>Retorna um objeto contendo os valores antigos e novos dos campos alterados no formulário.<br>
         <code> {objOld: [name: 'Robert'], objNew: [name: 'Roberty']}</code>
-        (<a href="frame">sideBySide</a>)
+        (<a href="#sideBySide">sideBySide</a>)
         </td>
     </tr>
     <tr>
         <td>clearElementSideBySide</td>
         <td align="center">nenhum</td>
         <td>Limpa os campos do formulário.
-        (<a href="frame">sideBySide</a>)
+        (<a href="#sideBySide">sideBySide</a>)
         </td>
     </tr>
     <tr>
@@ -681,5 +913,15 @@ Esses métodos serão utilizados no grid instanciado. Ex.:<br>
         </td>
         <td>Imprime os dados do grid. É possível passar um cabeçalho para impressão via parâmetro.
         </td>
+    </tr>
+    <tr>
+        <td>getDuplicityAll</td>
+        <td align="center">nenhum</td>
+        <td>Chama a função execute de <a href="#duplicity">duplicity</a> dos fields informados.</td>
+    </tr>
+    <tr>
+        <td>showMessageDuplicity</td>
+        <td align="center">text: String</td>
+        <td>Mostra uma mensagem de alerta!</td>
     </tr>
 </table>
