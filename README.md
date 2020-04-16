@@ -654,7 +654,8 @@ grid.queryOpen({ desc: 'sherlock', maxItem: 20 })</pre>
                         <pre> duplicity: {
             dataField: ['id'],
             execute: async (r) => {
-                let result = await fetch('https://www.googleapis.com/books/v1/volumes?q=' + r.value + '&maxResults=1')
+                let result = await fetch('https://www.googleapis.com/books/v1/volumes?
+                q=' + r.value + '&maxResults=1')
                     .then(response => {
                         return response.json();
                     })
@@ -949,3 +950,8 @@ Esses métodos serão utilizados no grid instanciado. Ex.:<br>
         <td>Adiciona a opção de selecionar a linha abaixo com a tecla informada.</td>
     </tr>
 </table>
+
+## Desenvolvedores
+
+[Francisco Alves](https://github.com/dffrancisco)<br>
+[Guilherme Trindade](https://github.com/guigagb)
