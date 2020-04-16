@@ -199,6 +199,20 @@ Create é responsável por instanciar o xGrid. Recebe um objeto como parâmetro 
         <td align="center">Function<br>(Callback)</td>
         <td align="center"></td>
     </tr>
+    <tr>
+        <td>keySelectUp</td>
+        <td>Define um array com teclas que ao serem pressionadas (individualmente) irão selecionar uma linha acima.
+        </td>
+        <td align="center">Array of Integer</td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td>keySelectDown</td>
+        <td>Define um array com teclas que ao serem pressionadas (individualmente) irão selecionar uma linha abaixo.
+        </td>
+        <td align="center">Array of Integer</td>
+        <td align="center"></td>
+    </tr>
 </table>
 <br>
 <table>
